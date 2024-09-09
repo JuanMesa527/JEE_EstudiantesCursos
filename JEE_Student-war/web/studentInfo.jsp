@@ -137,8 +137,8 @@
         <br>
         <table border="1">
             <th>Codigo Inscipcion</th>
-            <th>student Id</th>
-            <th>Codigo de curso</th>
+            <th>student</th>
+            <th>curso</th>
                 <c:forEach items="${allInscripciones}" var="insc">
                 <tr>
                     <td>${insc.codigoinscripcion}</td>

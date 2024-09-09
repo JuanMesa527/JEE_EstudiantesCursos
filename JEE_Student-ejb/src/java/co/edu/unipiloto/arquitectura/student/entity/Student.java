@@ -122,7 +122,7 @@ public class Student implements Serializable {
 
     @Override
     public String toString() {
-        return "co.edu.unipiloto.arquitectura.student.entity.Student[ studentid=" + studentid + " ]";
+        return "[ studentid=" + studentid + ", lastname=" + lastname + " ]";
     }
 
     @XmlTransient

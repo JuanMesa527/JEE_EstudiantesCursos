@@ -134,7 +134,7 @@ public class Curso implements Serializable {
 
     @Override
     public String toString() {
-        return "co.edu.unipiloto.arquitectura.student.entity.Curso[ codigocurso=" + codigocurso + " ]";
+        return "[ codigocurso=" + codigocurso + ", nombreCurso=" + nombrecurso + " ]";
     }
 
     @XmlTransient

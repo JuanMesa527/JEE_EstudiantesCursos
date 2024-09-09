@@ -99,7 +99,7 @@ public class InscripcionServlet extends HttpServlet {
             List inscripciones=new ArrayList();
             inscripciones.add(inscripcionFacade.find(codigoInscripcion));
             
-            request.setAttribute("allInscripcion", inscripciones);
+            request.setAttribute("allInscripciones", inscripciones);
             request.setAttribute("allCursos", cursoFacade.findAll());
             request.setAttribute("allStudents", studentFacade.findAll());
             request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
