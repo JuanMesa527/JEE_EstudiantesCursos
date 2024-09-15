@@ -35,8 +35,7 @@ public class StudentServlet extends HttpServlet {
 
     @EJB
     private StudentFacadeLocal studentFacade;
-    
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -49,63 +48,74 @@ public class StudentServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        String action=request.getParameter("action");
-        
-        String idStr=request.getParameter("studentId");
-        Integer id = new Integer(idStr);
-        
-        if (action.equals("Add")) {
-            String firstname = request.getParameter("firstName");    
-            String lastname = request.getParameter("lastName");
-            String yearLevelStr = request.getParameter("yearLevel");
-            Integer yearLevel = new Integer(yearLevelStr);
-            Student estudiante = new Student(id,firstname,lastname,yearLevel);
-            
-            studentFacade.create(estudiante);
-            
+
+        String action = request.getParameter("action");
+        try {
+            String idStr = request.getParameter("studentId");
+            Integer id = new Integer(idStr);
+
+            if (action.equals("Add")) {
+                String firstname = request.getParameter("firstName");
+                String lastname = request.getParameter("lastName");
+                String yearLevelStr = request.getParameter("yearLevel");
+                Integer yearLevel = new Integer(yearLevelStr);
+                Student estudiante = new Student(id, firstname, lastname, yearLevel);
+
+                studentFacade.create(estudiante);
+
+                request.setAttribute("allStudents", studentFacade.findAll());
+                request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                request.setAttribute("allCursos", cursoFacade.findAll());
+                request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+            } else if (action.equals("Edit")) {
+                String firstname = request.getParameter("firstName");
+                String lastname = request.getParameter("lastName");
+                String yearLevelStr = request.getParameter("yearLevel");
+                Integer yearLevel = new Integer(yearLevelStr);
+                Student estudiante = new Student(id, firstname, lastname, yearLevel);
+
+                studentFacade.edit(estudiante);
+
+                request.setAttribute("allStudents", studentFacade.findAll());
+                request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                request.setAttribute("allCursos", cursoFacade.findAll());
+                request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+            } else if (action.equals("Delete")) {
+                String firstname = request.getParameter("firstName");
+                String lastname = request.getParameter("lastName");
+                String yearLevelStr = request.getParameter("yearLevel");
+                Integer yearLevel = new Integer(yearLevelStr);
+                Student estudiante = new Student(id, firstname, lastname, yearLevel);
+
+                studentFacade.remove(estudiante);
+
+                request.setAttribute("allStudents", studentFacade.findAll());
+                request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                request.setAttribute("allCursos", cursoFacade.findAll());
+                request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+            } else if (action.equals("Search")) {
+                List estudiantes = new ArrayList();
+                estudiantes.add(studentFacade.find(id));
+
+                request.setAttribute("allStudents", estudiantes);
+                request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                request.setAttribute("allCursos", cursoFacade.findAll());
+                request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+            }
+        } catch (java.lang.NumberFormatException e) {
+            request.setAttribute("error", "Complete y verifique todos los campos, ERROR: " + e.getMessage());
+            request.setAttribute("allCursos", cursoFacade.findAll());
             request.setAttribute("allStudents", studentFacade.findAll());
             request.setAttribute("allInscripciones", inscripcionFacade.findAll());
-            request.setAttribute("allCursos", cursoFacade.findAll());
             request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
-        } else if(action.equals("Edit")){
-            String firstname = request.getParameter("firstName");    
-            String lastname = request.getParameter("lastName");
-            String yearLevelStr = request.getParameter("yearLevel");
-            Integer yearLevel = new Integer(yearLevelStr);
-            Student estudiante = new Student(id,firstname,lastname,yearLevel);
-            
-            studentFacade.edit(estudiante);
-            
+        } catch (javax.ejb.EJBException e) {
+            request.setAttribute("error", "ID o llave principal repetida, verifique los campos, ERROR: " + e.getMessage());
+            request.setAttribute("allCursos", cursoFacade.findAll());
             request.setAttribute("allStudents", studentFacade.findAll());
             request.setAttribute("allInscripciones", inscripcionFacade.findAll());
-            request.setAttribute("allCursos", cursoFacade.findAll());
-            request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
-        } else if(action.equals("Delete")){
-            String firstname = request.getParameter("firstName");    
-            String lastname = request.getParameter("lastName");
-            String yearLevelStr = request.getParameter("yearLevel");
-            Integer yearLevel = new Integer(yearLevelStr);
-            Student estudiante = new Student(id,firstname,lastname,yearLevel);
-            
-            studentFacade.remove(estudiante);
-            
-            request.setAttribute("allStudents", studentFacade.findAll());
-            request.setAttribute("allInscripciones", inscripcionFacade.findAll());
-            request.setAttribute("allCursos", cursoFacade.findAll());
-            request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
-        } else if(action.equals("Search")){
-            List estudiantes=new ArrayList();
-            estudiantes.add(studentFacade.find(id));
-            
-            request.setAttribute("allStudents", estudiantes);
-            request.setAttribute("allInscripciones", inscripcionFacade.findAll());
-            request.setAttribute("allCursos", cursoFacade.findAll());
             request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
         }
-        
-       
-        
+
 //        try (PrintWriter out = response.getWriter()) {
 //            /* TODO output your page here. You may use following sample code. */
 //            out.println("<!DOCTYPE html>");

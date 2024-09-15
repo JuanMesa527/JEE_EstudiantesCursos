@@ -13,6 +13,7 @@
         <title>Student Information</title>
     </head>
     <body>
+        <b name="error">${error}</b>
         <h1>Student Information</h1>
         <form action="./StudentServlet" method="POST"> 
             <table>

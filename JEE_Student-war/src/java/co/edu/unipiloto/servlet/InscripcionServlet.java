@@ -29,14 +29,13 @@ public class InscripcionServlet extends HttpServlet {
 
     @EJB
     private StudentFacadeLocal studentFacade;
-    
+
     @EJB
     private CursoFacadeLocal cursoFacade;
 
     @EJB
     private InscripcionFacadeLocal inscripcionFacade;
-    
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -49,59 +48,87 @@ public class InscripcionServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        String action=request.getParameter("action");
-        
-        String codigoInscripcionStr=request.getParameter("codigoInscripcion");
-        Integer codigoInscripcion = new Integer(codigoInscripcionStr);
-        
-        if (action.equals("Add")) {
-            String studentIdStr=request.getParameter("studentId");
-            Integer studentId = new Integer(studentIdStr);
-            String codigoCursoStr=request.getParameter("codigoCurso");
-            Integer codigoCurso = new Integer(codigoCursoStr);
-            Inscripcion inscripcion = new Inscripcion(codigoInscripcion,cursoFacade.find(codigoCurso),studentFacade.find(studentId));
-            
-            
-            inscripcionFacade.create(inscripcion);
-            
+
+        String action = request.getParameter("action");
+        try {
+            String codigoInscripcionStr = request.getParameter("codigoInscripcion");
+            Integer codigoInscripcion = new Integer(codigoInscripcionStr);
+
+            if (action.equals("Add")) {
+                String studentIdStr = request.getParameter("studentId");
+                Integer studentId = new Integer(studentIdStr);
+                String codigoCursoStr = request.getParameter("codigoCurso");
+                Integer codigoCurso = new Integer(codigoCursoStr);
+                if (cursoFacade.find(codigoCurso) == null) {
+                    request.setAttribute("error", "Curso inexistente en DB, por favor verifique la informacion");
+                    request.setAttribute("allCursos", cursoFacade.findAll());
+                    request.setAttribute("allStudents", studentFacade.findAll());
+                    request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                    request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+                    return;
+                }
+                if (studentFacade.find(studentId) == null) {
+                    request.setAttribute("error", "Student inexistente en DB, por favor verifique la informacion");
+                    request.setAttribute("allCursos", cursoFacade.findAll());
+                    request.setAttribute("allStudents", studentFacade.findAll());
+                    request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                    request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+                    return;
+                }
+                Inscripcion inscripcion = new Inscripcion(codigoInscripcion, cursoFacade.find(codigoCurso), studentFacade.find(studentId));
+
+                inscripcionFacade.create(inscripcion);
+
+                request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                request.setAttribute("allCursos", cursoFacade.findAll());
+                request.setAttribute("allStudents", studentFacade.findAll());
+                request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+            } else if (action.equals("Edit")) {
+                String studentIdStr = request.getParameter("studentId");
+                Integer studentId = new Integer(studentIdStr);
+                String codigoCursoStr = request.getParameter("codigoCurso");
+                Integer codigoCurso = new Integer(codigoCursoStr);
+                Inscripcion inscripcion = new Inscripcion(codigoInscripcion, cursoFacade.find(codigoCurso), studentFacade.find(studentId));
+
+                inscripcionFacade.edit(inscripcion);
+
+                request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                request.setAttribute("allCursos", cursoFacade.findAll());
+                request.setAttribute("allStudents", studentFacade.findAll());
+                request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+            } else if (action.equals("Delete")) {
+                String studentIdStr = request.getParameter("studentId");
+                Integer studentId = new Integer(studentIdStr);
+                String codigoCursoStr = request.getParameter("codigoCurso");
+                Integer codigoCurso = new Integer(codigoCursoStr);
+                Inscripcion inscripcion = new Inscripcion(codigoInscripcion, cursoFacade.find(codigoCurso), studentFacade.find(studentId));
+
+                inscripcionFacade.remove(inscripcion);
+
+                request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+                request.setAttribute("allCursos", cursoFacade.findAll());
+                request.setAttribute("allStudents", studentFacade.findAll());
+                request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+            } else if (action.equals("Search")) {
+                List inscripciones = new ArrayList();
+                inscripciones.add(inscripcionFacade.find(codigoInscripcion));
+
+                request.setAttribute("allInscripciones", inscripciones);
+                request.setAttribute("allCursos", cursoFacade.findAll());
+                request.setAttribute("allStudents", studentFacade.findAll());
+                request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+            }
+        } catch (java.lang.NumberFormatException e) {
+            request.setAttribute("error", "Complete y verifique todos los campos, ERROR: " + e.getMessage());
+            request.setAttribute("allCursos", cursoFacade.findAll());
+            request.setAttribute("allStudents", studentFacade.findAll());
             request.setAttribute("allInscripciones", inscripcionFacade.findAll());
+            request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
+        } catch (javax.ejb.EJBException e) {
+            request.setAttribute("error", "ID o llave principal repetida, verifique los campos, ERROR: " + e.getMessage());
             request.setAttribute("allCursos", cursoFacade.findAll());
             request.setAttribute("allStudents", studentFacade.findAll());
-            request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
-        } else if(action.equals("Edit")){
-            String studentIdStr=request.getParameter("studentId");
-            Integer studentId = new Integer(studentIdStr);
-            String codigoCursoStr=request.getParameter("codigoCurso");
-            Integer codigoCurso = new Integer(codigoCursoStr);
-            Inscripcion inscripcion = new Inscripcion(codigoInscripcion,cursoFacade.find(codigoCurso),studentFacade.find(studentId));
-            
-            inscripcionFacade.edit(inscripcion);
-            
             request.setAttribute("allInscripciones", inscripcionFacade.findAll());
-            request.setAttribute("allCursos", cursoFacade.findAll());
-            request.setAttribute("allStudents", studentFacade.findAll());
-            request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
-        } else if(action.equals("Delete")){
-            String studentIdStr=request.getParameter("studentId");
-            Integer studentId = new Integer(studentIdStr);
-            String codigoCursoStr=request.getParameter("codigoCurso");
-            Integer codigoCurso = new Integer(codigoCursoStr);
-            Inscripcion inscripcion = new Inscripcion(codigoInscripcion,cursoFacade.find(codigoCurso),studentFacade.find(studentId));
-            
-            inscripcionFacade.remove(inscripcion);
-            
-            request.setAttribute("allInscripciones", inscripcionFacade.findAll());
-            request.setAttribute("allCursos", cursoFacade.findAll());
-            request.setAttribute("allStudents", studentFacade.findAll());
-            request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
-        } else if(action.equals("Search")){
-            List inscripciones=new ArrayList();
-            inscripciones.add(inscripcionFacade.find(codigoInscripcion));
-            
-            request.setAttribute("allInscripciones", inscripciones);
-            request.setAttribute("allCursos", cursoFacade.findAll());
-            request.setAttribute("allStudents", studentFacade.findAll());
             request.getRequestDispatcher("studentInfo.jsp").forward(request, response);
         }
 //        try (PrintWriter out = response.getWriter()) {
